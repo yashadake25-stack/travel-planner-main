@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Sign up</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body style="padding:20px">
+  <div class="container">
+    <h2>Sign up</h2>
+    <form id="form" class="form">
+      <label for="email">Email</label>
+      <input id="email" type="email" placeholder="Email" required><br>
+      <label for="pw">Password</label>
+      <input id="pw" type="password" placeholder="Password" required><br>
+      <button class="primary-btn" type="submit">Create account</button>
+    </form>
+    <p class="muted" style="text-align:center; margin-top: 20px;">
+      <a href="login.html" class="ghost-btn">Already have an account? Login</a>
+      <a href="index.html" class="ghost-btn" style="margin-left: 10px;">Back to Home</a>
+    </p>
+  </div>
+
+  <script type="module">
+    import { auth, createUserWithEmailAndPassword } from "./firebase.js";
+
+    const form = document.getElementById('form');
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const pw = document.getElementById('pw').value;
+      try{
+        await createUserWithEmailAndPassword(auth, email, pw);
+        alert("Account created successfully! You are now logged in.");
+        location.href='index.html';
+      }catch(err){
+        alert("Sign up failed: " + err.message);
+        console.error("Sign up error:", err);
+      }
+    });
+  </script>
+</body>
+</html>

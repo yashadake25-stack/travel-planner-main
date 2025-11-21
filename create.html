@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Create Spot</title>
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="topbar" style="position: static; border-bottom: none; padding: 0; margin-bottom: 20px;">
+      <div><strong>Create Spot</strong></div>
+      <div style="display:flex;gap:8px">
+        <a class="pill" href="./index.html">Back to Swipe</a>
+        <button class="pill" id="btn-login" style="display:none;">Login</button>
+        <button class="pill" id="btn-logout" style="display:none;">Logout</button>
+      </div>
+    </div>
+
+    <div class="form"> <!-- Reusing .form for card-like styling -->
+      <div class="row" style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+        <div>
+          <label for="name">Name</label>
+          <input id="name" placeholder="Manali Adventure"/>
+        </div>
+        <div>
+          <label for="location">Location</label>
+          <input id="location" placeholder="Manali, HP"/>
+        </div>
+      </div>
+
+      <div class="row" style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+        <div>
+          <label for="imageURL">Image URL</label>
+          <input id="imageURL" placeholder="https://example.com/image.jpg"/>
+        </div>
+        <div>
+          <label for="cost">Cost (₹)</label>
+          <input id="cost" type="number" placeholder="20000"/>
+        </div>
+      </div>
+
+      <div class="row" style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+        <div>
+          <label for="people">People</label>
+          <input id="people" type="number" placeholder="2"/>
+        </div>
+        <div>
+          <label for="transport">Transport</label>
+          <input id="transport" placeholder="flight / train / car"/>
+        </div>
+      </div>
+
+      <div class="row" style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+        <div>
+          <label for="startDate">Start Date</label>
+          <input id="startDate" type="date"/>
+        </div>
+        <div>
+          <label for="endDate">End Date</label>
+          <input id="endDate" type="date"/>
+        </div>
+      </div>
+
+      <div>
+        <label for="points">Points of Interest</label>
+        <textarea id="points" placeholder="beaches, church, cafe…"></textarea>
+      </div>
+
+      <div style="margin-top:14px;display:flex;gap:10px;align-items:center;">
+        <button class="primary-btn" id="btn-add">Add Spot</button>
+        <span class="muted" id="status"></span>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import {
+      auth, db, provider,
+      collection, addDoc, serverTimestamp,
+      onAuthStateChanged, signInWithPopup, signOut
+    } from "./firebase.js";
+
+    const btnLogin = document.getElementById('btn-login');
+    const btnLogout = document.getElementById('btn-logout');
+    const statusEl = document.getElementById('status');
+
+    btnLogin.onclick = async ()=> { await signInWithPopup(auth, provider); };
+    btnLogout.onclick = async ()=> { await signOut(auth); };
+
+    onAuthStateChanged(auth, (u)=>{
+      if (!u){
+        btnLogin.style.display = "";
+        btnLogout.style.display = "none";
+        statusEl.textContent = 'Please login to create a spot.';
+      } else {
+        btnLogin.style.display = "none";
+        btnLogout.style.display = "";
+        statusEl.textContent = ''; // Clear status if logged in
+      }
+    });
+
+    document.getElementById('btn-add').onclick = async ()=>{
+      const user = auth.currentUser;
+      if (!user){
+        alert('Please login first to create a spot.');
+        return;
+      }
+
+      const data = {
+        name: document.getElementById('name').value.trim(),
+        location: document.getElementById('location').value.trim(),
+        imageURL: document.getElementById('imageURL').value.trim(),
+        cost: Number(document.getElementById('cost').value || 0),
+        people: Number(document.getElementById('people').value || 0),
+        transport: document.getElementById('transport').value.trim(),
+        startDate: document.getElementById('startDate').value,
+        endDate: document.getElementById('endDate').value,
+        points: document.getElementById('points').value.trim(),
+        createdAt: serverTimestamp(),
+        createdBy: user.uid,
+        creatorEmail: user.email // Store creator's email for easier identification
+      };
+
+      // Basic validation
+      if (!data.name || !data.location || !data.imageURL) {
+        alert('Please fill in Name, Location, and Image URL.');
+        return;
+      }
+
+      try{
+        statusEl.textContent = 'Saving…';
+        await addDoc(collection(db,'spots'), data);
+        statusEl.textContent = 'Saved! Go back to Swipe.';
+        // quick reset form
+        document.getElementById('name').value = '';
+        document.getElementById('location').value = '';
+        document.getElementById('imageURL').value = '';
+        document.getElementById('cost').value = '';
+        document.getElementById('people').value = '';
+        document.getElementById('transport').value = '';
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+        document.getElementById('points').value = '';
+
+      }catch(e){
+        console.error(e);
+        statusEl.textContent = 'Error: ' + (e.message || e);
+        alert('Error adding spot. Check console and Firestore rules.');
+      }
+    };
+  </script>
+</body>
+</html>

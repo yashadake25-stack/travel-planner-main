@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Travel Planner — Swipe</title>
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">➤ Travel Planner</div>
+    <div style="display:flex;gap:10px">
+      <a href="./create.html" class="pill btn">Create Spot</a>
+      <button class="pill" id="btn-admin">Admin Panel</button>
+      <!-- New: Login options container -->
+      <div id="login-options" style="display:flex;gap:10px;">
+        <button class="pill" id="btn-login-google">Login with Google</button>
+        <a href="./login.html" class="pill btn" id="btn-login-email">Login with Email</a>
+      </div>
+      <button class="pill" id="btn-logout" style="display:none">Logout</button>
+    </div>
+  </div>
+
+  <div class="page">
+    <div id="card-stack"></div>
+    <div id="empty-state">No more spots — come back later!</div>
+  </div>
+
+  <!-- Right vertical actions -->
+  <div class="vpanel">
+    <button class="fab" id="btn-like"      title="Interested">❤️</button>
+    <button class="fab" id="btn-nope"      title="Not interested">💔</button>
+    <button class="fab" id="btn-skip"      title="Skip">⏩</button>
+    <button class="fab" id="btn-review"    title="Rewind">🔄</button>
+  </div>
+
+  <!-- Lists modal -->
+  <div class="backdrop" id="list-backdrop">
+    <div class="modal">
+      <div class="hd">
+        <div id="list-title">My List</div>
+        <div class="x" id="list-close">✕</div>
+      </div>
+      <div class="bd" id="list-body">Loading…</div>
+    </div>
+  </div>
+
+  <!-- People modal -->
+  <div class="backdrop" id="people-backdrop">
+    <div class="modal">
+      <div class="hd">
+        <div id="people-title">People</div>
+        <div class="x" id="people-close">✕</div>
+      </div>
+      <div class="bd" id="people-body">Loading…</div>
+    </div>
+  </div>
+
+  <!-- Small launcher for lists -->
+  <div style="position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:8px; z-index: 900;">
+    <button class="pill" id="open-interested">My Interested</button>
+    <button class="pill" id="open-not">My Not Interested</button>
+    <button class="pill" id="open-skipped">My Skipped</button>
+  </div>
+
+  <!-- Firebase app code -->
+  <script type="module" src="./firebase.js"></script>
+  <!-- App logic -->
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
